@@ -47,6 +47,7 @@ namespace desktop_box
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            this.TopMost = true;
             ComponentResourceManager resources = new ComponentResourceManager(typeof(Form1));
             Bitmap bitmap = (Bitmap) resources.GetObject("eyes");
 
@@ -59,7 +60,6 @@ namespace desktop_box
             {
                 bFormDragging = true;
                 oPointClicked = new Point(e.X, e.Y);
-                MoveWindows(222, 540);
             }
         }
 
