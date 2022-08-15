@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace desktop_box
@@ -50,8 +51,8 @@ namespace desktop_box
             this.TopMost = true;
             ComponentResourceManager resources = new ComponentResourceManager(typeof(Form1));
             Bitmap bitmap = (Bitmap) resources.GetObject("eyes");
-
-            SetBits(ResizeBitMap(bitmap, 200));
+            Bitmap resizeBitMap = ResizeBitMap(bitmap, 200);
+            SetBits(resizeBitMap);
         }
 
                private void Form1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -83,6 +84,15 @@ namespace desktop_box
             }
         }
 
+        public void MoveWindows(int beforeWidth, int beforeHeight, int afterWidth, int afterHeigth, double duration)
+        {
+            for (int i = 0; i < duration*1000 / 10; i++)
+            {
+                Location = new Point((int)(beforeWidth + (i + 1) * ((afterWidth - beforeWidth) / (duration * 1000 / 10))), (int)(beforeHeight + (i + 1) * ((afterHeigth - beforeHeight) / (duration * 1000 / 10))));
+                Thread.Sleep(10);
+            }
+        }
+
         public void MoveWindows(int width, int height)
         {
             Location = new Point(width, height);
@@ -91,6 +101,22 @@ namespace desktop_box
         public void emptBitMap()
         {
             SetBits(new Bitmap(1, 1));
+        }
+
+        public void Opcation(Bitmap bitmap, int op)
+        {
+            for(int i = 0; i < (bitmap.Width); i++)
+            {
+                for(int j=0; j < (bitmap.Height ); j++)
+                {
+                    Color color = bitmap.GetPixel(i, j);
+                    if (!(color.G == 0 && color.B == 0 && color.R == 0))
+                    {
+                        bitmap.SetPixel(i, j, Color.FromArgb(op, color));
+                    }
+                }
+            }
+            
         }
 
 
@@ -140,6 +166,10 @@ namespace desktop_box
             }
         }
 
+        private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
     }
 }
    
