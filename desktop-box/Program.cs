@@ -16,8 +16,10 @@ namespace desktop_box
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            HttpApiServer.Run(null);
-            Application.Run(new Form1());
+            HttpApiServer httpApiServer = new HttpApiServer();
+            Form1 mainForm = new Form1();
+            httpApiServer.Run(mainForm);
+            Application.Run(mainForm);
         }
     }
 }
