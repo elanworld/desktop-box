@@ -93,31 +93,39 @@ namespace desktop_box
 
             addHandle((req) =>
             {
-                StreamReader stream = new StreamReader(req.InputStream);
-                string body = stream.ReadToEnd();
-                if (!"".Equals(body))
+                try
                 {
-                    Class1 class1 = JsonConvert.DeserializeObject<Class1>(body);
-                    if (req.RawUrl.Equals("/move"))
+                    StreamReader stream = new StreamReader(req.InputStream);
+                    string body = stream.ReadToEnd();
+                    if (!"".Equals(body))
                     {
-                        if (class1.X != null && class1.Y != null)
+                        Class1 class1 = JsonConvert.DeserializeObject<Class1>(body);
+                        if (req.RawUrl.Equals("/move"))
                         {
-                            mainForm.MoveWindows((int)class1.X, (int)class1.Y);
+                            if (class1.X != null && class1.Y != null)
+                            {
+                                mainForm.MoveWindows((int)class1.X, (int)class1.Y);
+                            }
+                            return JsonConvert.SerializeObject(class1);
                         }
-                        return JsonConvert.SerializeObject(class1);
+                        if (req.RawUrl.Equals("/swap"))
+                        {
+                            mainForm.MoveWindows((int)class1.X, (int)class1.Y, (int)class1.X1, (int)class1.Y1, class1.duration);
+                            return JsonConvert.SerializeObject(class1);
+                        }
+                        if (req.RawUrl.Equals("/state"))
+                        {
+                            mainForm.Transparency(class1.transparency);
+                            return JsonConvert.SerializeObject(class1);
+                        }
                     }
-                    if (req.RawUrl.Equals("/swap"))
-                    {
-                        mainForm.MoveWindows((int)class1.X, (int)class1.Y,(int)class1.X1, (int)class1.Y1,class1.duration);
-                        return JsonConvert.SerializeObject(class1);
-                    }
-                    if (req.RawUrl.Equals("/state"))
-                    {
-                        mainForm.Transparency(class1.transparency);
-                        return JsonConvert.SerializeObject(class1);
-                    }
+                    return null;
                 }
-                return null;
+                catch (Exception e)
+                {
+
+                    return e.Message;
+                }
             });
             // Handle requests
             Task listenTask = HandleIncomingConnections();
