@@ -10,6 +10,7 @@ namespace desktop_box
     {
         private bool bFormDragging;
         private Point oPointClicked;
+        Bitmap bitmap;
 
         public Form1()
         {
@@ -49,10 +50,10 @@ namespace desktop_box
         private void Form1_Load(object sender, EventArgs e)
         {
             this.TopMost = true;
-            ComponentResourceManager resources = new ComponentResourceManager(typeof(Form1));
-            Bitmap bitmap = (Bitmap) resources.GetObject("eyes");
-            Bitmap resizeBitMap = ResizeBitMap(bitmap, 200);
-            SetBits(resizeBitMap);
+            ComponentResourceManager resources = new ComponentResourceManager(typeof(Resource1));
+            Bitmap eyes = (Bitmap) resources.GetObject("eyes");
+            bitmap = ResizeBitMap(eyes, 200);
+            SetBits(bitmap);
         }
 
                private void Form1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -103,7 +104,8 @@ namespace desktop_box
             SetBits(new Bitmap(1, 1));
         }
 
-        public void Opcation(Bitmap bitmap, int op)
+        public void Transparency(Bitmap bitmap, int op)
+
         {
             for(int i = 0; i < (bitmap.Width); i++)
             {
@@ -116,6 +118,27 @@ namespace desktop_box
                     }
                 }
             }
+            
+        }
+        public void Transparency(double op)
+        {
+            if (op==0)
+            {
+                emptBitMap();
+                return;
+            }
+            for(int i = 0; i < (bitmap.Width); i++)
+            {
+                for(int j=0; j < (bitmap.Height ); j++)
+                {
+                    Color color = bitmap.GetPixel(i, j);
+                    if (!(color.G == 0 && color.B == 0 && color.R == 0))
+                    {
+                        bitmap.SetPixel(i, j, Color.FromArgb((int)(op * 255), color));
+                    }
+                }
+            }
+            SetBits(bitmap);
             
         }
 
@@ -169,6 +192,11 @@ namespace desktop_box
         private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void swapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MoveWindows(10, 900, 1780, 5, 1);
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.IO;
+using desktop_box.entity;
 
 namespace desktop_box
 {
@@ -92,18 +93,32 @@ namespace desktop_box
 
             addHandle((req) =>
             {
-                string x = req.QueryString["x"];
-                string y = req.QueryString["y"];
-                System.Xml.Linq.XDocument xDocument = JsonConvert.DeserializeXNode("{\"res\":\"sucess\"");
-                if (x != null && y != null)
+                StreamReader stream = new StreamReader(req.InputStream);
+                string body = stream.ReadToEnd();
+                if (!"".Equals(body))
                 {
-                    Int32.TryParse(x, out int i);
-                    Int32.TryParse(y, out int j);
-                    mainForm.MoveWindows(i,j);
+                    Class1 class1 = JsonConvert.DeserializeObject<Class1>(body);
+                    if (req.RawUrl.Equals("/move"))
+                    {
+                        if (class1.X != null && class1.Y != null)
+                        {
+                            mainForm.MoveWindows((int)class1.X, (int)class1.Y);
+                        }
+                        return JsonConvert.SerializeObject(class1);
+                    }
+                    if (req.RawUrl.Equals("/swap"))
+                    {
+                        mainForm.MoveWindows((int)class1.X, (int)class1.Y,(int)class1.X1, (int)class1.Y1,class1.duration);
+                        return JsonConvert.SerializeObject(class1);
+                    }
+                    if (req.RawUrl.Equals("/state"))
+                    {
+                        mainForm.Transparency(class1.transparency);
+                        return JsonConvert.SerializeObject(class1);
+                    }
                 }
-                return xDocument.ToString();
+                return null;
             });
-
             // Handle requests
             Task listenTask = HandleIncomingConnections();
         }

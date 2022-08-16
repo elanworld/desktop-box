@@ -5,8 +5,6 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "desktop-box", "desktop-box\desktop-box.csproj", "{8E5FE9FE-D356-4A5E-B5CF-673D349A20AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snowy", "D:\program\data\code\tmp\DesktopPet\Snowy\Snowy.csproj", "{52CE969C-E8B1-4098-ABEE-0A6C9127CC95}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{8E5FE9FE-D356-4A5E-B5CF-673D349A20AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E5FE9FE-D356-4A5E-B5CF-673D349A20AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E5FE9FE-D356-4A5E-B5CF-673D349A20AA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{52CE969C-E8B1-4098-ABEE-0A6C9127CC95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52CE969C-E8B1-4098-ABEE-0A6C9127CC95}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52CE969C-E8B1-4098-ABEE-0A6C9127CC95}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52CE969C-E8B1-4098-ABEE-0A6C9127CC95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
