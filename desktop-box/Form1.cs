@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace desktop_box
 {
@@ -10,7 +15,7 @@ namespace desktop_box
     {
         private bool bFormDragging;
         private Point oPointClicked;
-        Bitmap bitmap;
+        public Controller controller;
 
         public Form1()
         {
@@ -45,18 +50,18 @@ namespace desktop_box
         #endregion
 
 
-
-
-        private void Form1_Load(object sender, EventArgs e)
+        //加载图片文件
+        private async void Form1_Load(object sender, EventArgs e)
         {
+            controller = new Controller(this);
             this.TopMost = true;
             ComponentResourceManager resources = new ComponentResourceManager(typeof(Resource1));
-            Bitmap eyes = (Bitmap) resources.GetObject("eyes");
-            bitmap = ResizeBitMap(eyes, 200);
-            SetBits(bitmap);
+            Bitmap eyes = (Bitmap)resources.GetObject("eyes");
+            SetBits(controller.ResizeBitMap(eyes, 200));
         }
 
-               private void Form1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+
+        private void Form1_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
@@ -87,7 +92,7 @@ namespace desktop_box
 
         public void MoveWindows(int beforeWidth, int beforeHeight, int afterWidth, int afterHeigth, double duration)
         {
-            for (int i = 0; i < duration*1000 / 10; i++)
+            for (int i = 0; i < duration * 1000 / 10; i++)
             {
                 Location = new Point((int)(beforeWidth + (i + 1) * ((afterWidth - beforeWidth) / (duration * 1000 / 10))), (int)(beforeHeight + (i + 1) * ((afterHeigth - beforeHeight) / (duration * 1000 / 10))));
                 Thread.Sleep(10);
@@ -99,62 +104,23 @@ namespace desktop_box
             Location = new Point(width, height);
         }
 
-        public void emptBitMap()
+
+
+        private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SetBits(new Bitmap(1, 1));
+            Application.Exit();
         }
 
-        public void Transparency(Bitmap bitmap, int op)
-
+        private void swapToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            for(int i = 0; i < (bitmap.Width); i++)
-            {
-                for(int j=0; j < (bitmap.Height ); j++)
-                {
-                    Color color = bitmap.GetPixel(i, j);
-                    if (!(color.G == 0 && color.B == 0 && color.R == 0))
-                    {
-                        bitmap.SetPixel(i, j, Color.FromArgb(op, color));
-                    }
-                }
-            }
-            
-        }
-        public void Transparency(double op)
-        {
-            if (op==0)
-            {
-                emptBitMap();
-                return;
-            }
-            for(int i = 0; i < (bitmap.Width); i++)
-            {
-                for(int j=0; j < (bitmap.Height ); j++)
-                {
-                    Color color = bitmap.GetPixel(i, j);
-                    if (!(color.G == 0 && color.B == 0 && color.R == 0))
-                    {
-                        bitmap.SetPixel(i, j, Color.FromArgb((int)(op * 255), color));
-                    }
-                }
-            }
-            SetBits(bitmap);
-            
-        }
-
-
-        public Bitmap ResizeBitMap(Bitmap bitmap, int width)
-        {
-            return new Bitmap(bitmap, width, width * bitmap.Height / bitmap.Width);
+            MoveWindows(10, 900, 1780, 5, 1);
         }
 
 
         public void SetBits(Bitmap bitmap)
         {
-
             if (!Bitmap.IsCanonicalPixelFormat(bitmap.PixelFormat) || !Bitmap.IsAlphaPixelFormat(bitmap.PixelFormat))
-                MessageBox.Show("Error Bitmap");
-
+                Console.WriteLine("Error Bitmap");
             IntPtr oldBits = IntPtr.Zero;
             IntPtr screenDC = Win32.GetDC(IntPtr.Zero);
             IntPtr hBitmap = IntPtr.Zero;
@@ -188,17 +154,7 @@ namespace desktop_box
                 Win32.DeleteDC(memDc);
             }
         }
-
-        private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
-
-        private void swapToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            MoveWindows(10, 900, 1780, 5, 1);
-        }
     }
 }
-   
+
 

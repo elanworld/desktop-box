@@ -25,11 +25,9 @@ namespace desktop_box
             {
                 // Will wait here until we hear from a connection
                 HttpListenerContext ctx = await listener.GetContextAsync();
-
                 // Peel out the requests and response objects
                 HttpListenerRequest req = ctx.Request;
                 HttpListenerResponse resp = ctx.Response;
-
                 // Print out some info about the request
                 Console.WriteLine(req.Url.ToString());
                 Console.WriteLine(req.HttpMethod);
@@ -37,7 +35,7 @@ namespace desktop_box
                 Console.WriteLine(req.UserAgent);
                 Console.WriteLine();
                 // Write the response info
-                string resStr= null;
+                string resStr = null;
                 foreach (var handle in handles)
                 {
                     resStr = handle(req);
@@ -62,7 +60,7 @@ namespace desktop_box
         }
 
 
-        public void addHandle(Func<HttpListenerRequest,String> func) 
+        public void addHandle(Func<HttpListenerRequest, String> func)
         {
             handles.Add(func);
         }
@@ -89,8 +87,6 @@ namespace desktop_box
             listener.Prefixes.Add(url);
             listener.Start();
             Console.WriteLine("Listening for connections on {0}", url);
-
-
             addHandle((req) =>
             {
                 try
@@ -99,31 +95,35 @@ namespace desktop_box
                     string body = stream.ReadToEnd();
                     if (!"".Equals(body))
                     {
-                        Class1 class1 = JsonConvert.DeserializeObject<Class1>(body);
+                        Body reqBody = JsonConvert.DeserializeObject<Body>(body);
                         if (req.RawUrl.Equals("/move"))
                         {
-                            if (class1.X != null && class1.Y != null)
+                            if (reqBody.X != null && reqBody.Y != null)
                             {
-                                mainForm.MoveWindows((int)class1.X, (int)class1.Y);
+                                mainForm.MoveWindows((int)reqBody.X, (int)reqBody.Y);
                             }
-                            return JsonConvert.SerializeObject(class1);
+                            return JsonConvert.SerializeObject(reqBody);
                         }
                         if (req.RawUrl.Equals("/swap"))
                         {
-                            mainForm.MoveWindows((int)class1.X, (int)class1.Y, (int)class1.X1, (int)class1.Y1, class1.duration);
-                            return JsonConvert.SerializeObject(class1);
+                            mainForm.MoveWindows((int)reqBody.X, (int)reqBody.Y, (int)reqBody.X1, (int)reqBody.Y1, reqBody.duration);
+                            return JsonConvert.SerializeObject(reqBody);
                         }
                         if (req.RawUrl.Equals("/state"))
                         {
-                            mainForm.Transparency(class1.transparency);
-                            return JsonConvert.SerializeObject(class1);
+                            mainForm.controller.Transparency(reqBody.transparency);
+                            return JsonConvert.SerializeObject(reqBody);
+                        }
+                        if (req.RawUrl.Equals("/showDir"))
+                        {
+                            mainForm.controller.ShowDicrectory(reqBody.showPath, reqBody);
+                            return JsonConvert.SerializeObject(reqBody);
                         }
                     }
-                    return null;
+                    return JsonConvert.SerializeObject(new Body());
                 }
                 catch (Exception e)
                 {
-
                     return e.Message;
                 }
             });
