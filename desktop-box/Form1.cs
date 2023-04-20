@@ -57,7 +57,7 @@ namespace desktop_box
             this.TopMost = true;
             ComponentResourceManager resources = new ComponentResourceManager(typeof(Resource1));
             Bitmap eyes = (Bitmap)resources.GetObject("eyes");
-            SetBits(controller.ResizeBitMap(eyes, 200));
+            SetBits(eyes);
         }
 
 
@@ -121,6 +121,7 @@ namespace desktop_box
         {
             if (!Bitmap.IsCanonicalPixelFormat(bitmap.PixelFormat) || !Bitmap.IsAlphaPixelFormat(bitmap.PixelFormat))
                 Console.WriteLine("Error Bitmap");
+            bitmap = this.controller.SetProp(bitmap);
             IntPtr oldBits = IntPtr.Zero;
             IntPtr screenDC = Win32.GetDC(IntPtr.Zero);
             IntPtr hBitmap = IntPtr.Zero;

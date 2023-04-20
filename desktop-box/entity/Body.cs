@@ -16,7 +16,7 @@ namespace desktop_box.entity
 
         public Double duration { get; set; }    
 
-        public Double transparency { get; set; }
+        public Double? transparency { get; set; }
 
         public String showPath { get; set; }
         public int? delay { get; set; }

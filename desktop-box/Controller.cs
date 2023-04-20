@@ -13,27 +13,40 @@ namespace desktop_box
 {
     public class Controller
     {
-        Bitmap bitmap;
+        public Bitmap bitmap { get; set; }
         Form1 form;
+        int delayShow = 200;
+        double transparency = 1;
+        int? width;
 
         public Controller(Form1 form)
         {
             this.form = form;
         }
 
-        public async void ShowDicrectory(String directory, Body body)
+        public async void ShowPath(string path, Body body)
         {
-            string[] pngFiles = Directory.GetFiles(directory, "*.png");
-            foreach (string pngFile in pngFiles)
+            this.delayShow = body.delay ?? this.delayShow;
+            this.width = body.width ?? this.width;
+            this.transparency = body.transparency ?? this.transparency;
+            if (File.Exists(path)) // 如果是文件
             {
-                Bitmap pngImage = new Bitmap(pngFile);
-                int timeDelay = (int)(body.delay == null ? 200 : body.delay);
-                int width = (int)(body.width == null ? 200 : body.width);
-                this.form.SetBits(this.ResizeBitMap(pngImage, width));
-                await Task.Delay(timeDelay);
+                Bitmap image = new Bitmap(path);
+                this.form.SetBits(image);
             }
-            this.emptBitMap();
+            else if (Directory.Exists(path)) // 如果是文件夹
+            {
+                string[] pngFiles = Directory.GetFiles(path, "*.png");
+                foreach (string pngFile in pngFiles)
+                {
+                    Bitmap pngImage = new Bitmap(pngFile);
+                    this.form.SetBits(pngImage);
+                    await Task.Delay(this.delayShow);
+                }
+                this.emptBitMap();
+            }
         }
+
 
         private List<Bitmap> ReadGifFrames(string filePath)
         {
@@ -68,50 +81,50 @@ namespace desktop_box
             return new Bitmap(bitmap, width, width * bitmap.Height / bitmap.Width);
         }
 
-
-        public void Transparency(Bitmap bitmap, int op)
-
-        {
-            for (int i = 0; i < (bitmap.Width); i++)
-            {
-                for (int j = 0; j < (bitmap.Height); j++)
-                {
-                    Color color = bitmap.GetPixel(i, j);
-                    if (!(color.G == 0 && color.B == 0 && color.R == 0))
-                    {
-                        bitmap.SetPixel(i, j, Color.FromArgb(op, color));
-                    }
-                }
-            }
-
-        }
+        /**
+         * 设置透明度
+         */
         public void Transparency(double op)
         {
-            if (op == 0)
-            {
-                emptBitMap();
-                return;
-            }
-            for (int i = 0; i < (bitmap.Width); i++)
-            {
-                for (int j = 0; j < (bitmap.Height); j++)
-                {
-                    Color color = bitmap.GetPixel(i, j);
-                    if (!(color.G == 0 && color.B == 0 && color.R == 0))
-                    {
-                        bitmap.SetPixel(i, j, Color.FromArgb((int)(op * 255), color));
-                    }
-                }
-            }
-            this.form.SetBits(bitmap);
+            this.transparency = op;
+            this.form.SetBits(this.bitmap);
 
         }
-
-
         public void emptBitMap()
         {
             this.form.SetBits(new Bitmap(1, 1));
         }
 
+        public Bitmap SetProp(Bitmap bitmap)
+        {
+            if (this.width != null)
+            {
+                bitmap = this.ResizeBitMap(bitmap, (int)this.width);
+            }
+            if (this.transparency == 0)
+            {
+                bitmap = new Bitmap(1, 1);
+            }
+            else if (this.transparency == 1)
+            {
+
+            }
+            else
+            {
+                for (int i = 0; i < (bitmap.Width); i++)
+                {
+                    for (int j = 0; j < (bitmap.Height); j++)
+                    {
+                        Color color = bitmap.GetPixel(i, j);
+                        if (!(color.G == 0 && color.B == 0 && color.R == 0))
+                        {
+                            bitmap.SetPixel(i, j, Color.FromArgb((int)(this.transparency * 255), color));
+                        }
+                    }
+                }
+            }
+            this.bitmap = bitmap;
+            return bitmap;
+        }
     }
 }

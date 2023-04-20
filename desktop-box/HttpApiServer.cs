@@ -111,12 +111,12 @@ namespace desktop_box
                         }
                         if (req.RawUrl.Equals("/state"))
                         {
-                            mainForm.controller.Transparency(reqBody.transparency);
+                            mainForm.controller.Transparency(reqBody.transparency??1);
                             return JsonConvert.SerializeObject(reqBody);
                         }
-                        if (req.RawUrl.Equals("/showDir"))
+                        if (req.RawUrl.Equals("/ShowPath"))
                         {
-                            mainForm.controller.ShowDicrectory(reqBody.showPath, reqBody);
+                            mainForm.controller.ShowPath(reqBody.showPath, reqBody);
                             return JsonConvert.SerializeObject(reqBody);
                         }
                     }
