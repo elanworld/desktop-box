@@ -80,7 +80,7 @@ namespace desktop_box
             return dataBytes;
         }
 
-        public void Run(Form1 mainForm)
+        public void Run(Controller contrller)
         {
             // Create a Http server and start listening for incoming connections
             listener = new HttpListener();
@@ -100,23 +100,23 @@ namespace desktop_box
                         {
                             if (reqBody.X != null && reqBody.Y != null)
                             {
-                                mainForm.MoveWindows((int)reqBody.X, (int)reqBody.Y);
+                                contrller.form.MoveWindows((int)reqBody.X, (int)reqBody.Y);
                             }
                             return JsonConvert.SerializeObject(reqBody);
                         }
                         if (req.RawUrl.Equals("/swap"))
                         {
-                            mainForm.MoveWindows((int)reqBody.X, (int)reqBody.Y, (int)reqBody.X1, (int)reqBody.Y1, reqBody.duration);
+                            contrller.form.MoveWindows((int)reqBody.X, (int)reqBody.Y, (int)reqBody.X1, (int)reqBody.Y1, reqBody.duration);
                             return JsonConvert.SerializeObject(reqBody);
                         }
                         if (req.RawUrl.Equals("/state"))
                         {
-                            mainForm.controller.Transparency(reqBody.transparency??1);
+                            contrller.Transparency(reqBody.transparency??1);
                             return JsonConvert.SerializeObject(reqBody);
                         }
                         if (req.RawUrl.Equals("/ShowPath"))
                         {
-                            mainForm.controller.ShowPath(reqBody.showPath, reqBody);
+                            contrller.ShowPath(reqBody.showPath, reqBody);
                             return JsonConvert.SerializeObject(reqBody);
                         }
                     }

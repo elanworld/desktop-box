@@ -18,8 +18,8 @@ namespace desktop_box
             Application.SetCompatibleTextRenderingDefault(false);
             HttpApiServer httpApiServer = new HttpApiServer();
             Form1 mainForm = new Form1();
-            httpApiServer.Run(mainForm);
-            Application.Run(mainForm);
+            httpApiServer.Run(new Controller(mainForm));
+           Application.Run(mainForm);
         }
     }
 }

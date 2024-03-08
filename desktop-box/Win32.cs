@@ -1,6 +1,7 @@
 ﻿namespace desktop_box
 {
     using System;
+    using System.Drawing;
     using System.Runtime.InteropServices;
 
     internal class Win32
@@ -68,6 +69,51 @@
                 this = new Win32.Size();
                 this.cx = cx;
                 this.cy = cy;
+            }
+        }
+
+        /**
+         * 设置屏幕图像
+         */
+        public static void SetBits(IntPtr handle, Bitmap bitmap, int x = 0, int y = 0, byte alpha = 255)
+        {
+            if (!Bitmap.IsCanonicalPixelFormat(bitmap.PixelFormat) || !Bitmap.IsAlphaPixelFormat(bitmap.PixelFormat))
+            {
+                Console.WriteLine("Error Bitmap");
+                return;
+            }
+
+            IntPtr oldBits = IntPtr.Zero;
+            IntPtr screenDC = Win32.GetDC(IntPtr.Zero);
+            IntPtr hBitmap = IntPtr.Zero;
+            IntPtr memDc = Win32.CreateCompatibleDC(screenDC);
+
+            try
+            {
+                Win32.Point topLoc = new Win32.Point(x, y);
+                Win32.Size bitMapSize = new Win32.Size(bitmap.Width, bitmap.Height);
+                Win32.BLENDFUNCTION blendFunc = new Win32.BLENDFUNCTION();
+                Win32.Point srcLoc = new Win32.Point(0, 0);
+
+                hBitmap = bitmap.GetHbitmap(Color.FromArgb(0));
+                oldBits = Win32.SelectObject(memDc, hBitmap);
+
+                blendFunc.BlendOp = Win32.AC_SRC_OVER;
+                blendFunc.SourceConstantAlpha = alpha;
+                blendFunc.AlphaFormat = Win32.AC_SRC_ALPHA;
+                blendFunc.BlendFlags = 0;
+
+                UpdateLayeredWindow(handle, screenDC, ref topLoc, ref bitMapSize, memDc, ref srcLoc, 0, ref blendFunc, Win32.ULW_ALPHA);
+            }
+            finally
+            {
+                if (hBitmap != IntPtr.Zero)
+                {
+                    Win32.SelectObject(memDc, oldBits);
+                    Win32.DeleteObject(hBitmap);
+                }
+                Win32.ReleaseDC(IntPtr.Zero, screenDC);
+                Win32.DeleteDC(memDc);
             }
         }
     }

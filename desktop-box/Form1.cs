@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Threading.Tasks;
+using Timer = System.Windows.Forms.Timer;
+
 
 namespace desktop_box
 {
@@ -15,11 +19,16 @@ namespace desktop_box
     {
         private bool bFormDragging;
         private Point oPointClicked;
-        public Controller controller;
+        [DllImport("user32.dll")]
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll")]
+        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
         public Form1()
         {
             InitializeComponent();
+
         }
         #region 重载
 
@@ -37,7 +46,8 @@ namespace desktop_box
             UpdateStyles();
         }
 
-        protected override CreateParams CreateParams
+        //创建一个分层窗口来支持 setBitmap
+        protected CreateParams CreateParamss
         {
             get
             {
@@ -50,14 +60,21 @@ namespace desktop_box
         #endregion
 
 
+        public void SetBits(Bitmap bitmap)
+        {
+            Win32.SetBits(this.Handle, bitmap);
+        }
+
         //加载图片文件
         private async void Form1_Load(object sender, EventArgs e)
         {
-            controller = new Controller(this);
             this.TopMost = true;
             ComponentResourceManager resources = new ComponentResourceManager(typeof(Resource1));
             Bitmap eyes = (Bitmap)resources.GetObject("eyes");
             SetBits(eyes);
+            // 设置窗口样式，使其不出现在Alt+Tab切换列表中
+            int WS_EX_TOOLWINDOW = 0x80;
+            SetWindowLong(this.Handle, -20, GetWindowLong(this.Handle, -20) | WS_EX_TOOLWINDOW);
         }
 
 
@@ -116,45 +133,35 @@ namespace desktop_box
             MoveWindows(10, 900, 1780, 5, 1);
         }
 
-
-        public void SetBits(Bitmap bitmap)
+        /**
+         * 在窗体上显示文字并删除文字(lanyer窗体未生效)
+         */
+        public void ShowText(string text, int timeout=5000)
         {
-            if (!Bitmap.IsCanonicalPixelFormat(bitmap.PixelFormat) || !Bitmap.IsAlphaPixelFormat(bitmap.PixelFormat))
-                Console.WriteLine("Error Bitmap");
-            bitmap = this.controller.SetProp(bitmap);
-            IntPtr oldBits = IntPtr.Zero;
-            IntPtr screenDC = Win32.GetDC(IntPtr.Zero);
-            IntPtr hBitmap = IntPtr.Zero;
-            IntPtr memDc = Win32.CreateCompatibleDC(screenDC);
+            // 设置窗体可见
+           // this.Opacity = 0.5D;
+            TextBox textBox = new TextBox();
+            textBox.Text = text;
+            textBox.Location = new Point(0, 0);
+            textBox.ReadOnly = true;
+            textBox.BorderStyle = BorderStyle.None;
+            this.Controls.Add(textBox);
 
-            try
+
+            // 创建一个计时器，一段时间后隐藏窗体
+            Timer textTimer = new Timer();
+            textTimer.Interval = timeout; // 5秒后隐藏窗体
+            textTimer.Tick += (sender, e) =>
             {
-                Win32.Point topLoc = new Win32.Point(Left, Top);
-                Win32.Size bitMapSize = new Win32.Size(bitmap.Width, bitmap.Height);
-                Win32.BLENDFUNCTION blendFunc = new Win32.BLENDFUNCTION();
-                Win32.Point srcLoc = new Win32.Point(0, 0);
-
-                hBitmap = bitmap.GetHbitmap(Color.FromArgb(0));
-                oldBits = Win32.SelectObject(memDc, hBitmap);
-
-                blendFunc.BlendOp = Win32.AC_SRC_OVER;
-                blendFunc.SourceConstantAlpha = 255;
-                blendFunc.AlphaFormat = Win32.AC_SRC_ALPHA;
-                blendFunc.BlendFlags = 0;
-
-                Win32.UpdateLayeredWindow(Handle, screenDC, ref topLoc, ref bitMapSize, memDc, ref srcLoc, 0, ref blendFunc, Win32.ULW_ALPHA);
-            }
-            finally
-            {
-                if (hBitmap != IntPtr.Zero)
-                {
-                    Win32.SelectObject(memDc, oldBits);
-                    Win32.DeleteObject(hBitmap);
-                }
-                Win32.ReleaseDC(IntPtr.Zero, screenDC);
-                Win32.DeleteDC(memDc);
-            }
+                this.Opacity = 1D;
+                this.Controls.Remove(textBox);
+                textTimer.Stop(); // 停止计时器
+                textTimer.Dispose(); // 释放计时器资源
+            };
+            textTimer.Start(); // 启动计时器
         }
+
+
     }
 }
 

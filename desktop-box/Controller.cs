@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows.Forms;
 using desktop_box.entity;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace desktop_box
 {
     public class Controller
     {
         public Bitmap bitmap { get; set; }
-        Form1 form;
+        public Form1 form;
         int delayShow = 200;
         double transparency = 1;
         int? width;
@@ -44,6 +45,10 @@ namespace desktop_box
                     await Task.Delay(this.delayShow);
                 }
                 this.emptBitMap();
+            }
+            else // 其他情况
+            {
+                this.form.ShowText(path, this.delayShow);
             }
         }
 
@@ -126,5 +131,36 @@ namespace desktop_box
             this.bitmap = bitmap;
             return bitmap;
         }
+
+        public static Bitmap TextToBitmap(string text, Font font)
+        {
+            // 创建一个临时的画布
+            Bitmap bitmap = new Bitmap(1, 1);
+            Graphics graphics = Graphics.FromImage(bitmap);
+
+            // 测量文本的大小
+            SizeF textSize = graphics.MeasureString(text, font);
+
+            // 释放临时画布
+            graphics.Dispose();
+            bitmap.Dispose();
+
+            // 根据文本大小创建新的位图
+            bitmap = new Bitmap((int)textSize.Width, (int)textSize.Height);
+            graphics = Graphics.FromImage(bitmap);
+
+            // 绘制不透明背景
+            graphics.Clear(Color.White); // 设置为不透明的白色背景
+
+            // 绘制文本到位图
+            graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias; // 设置抗锯齿
+            graphics.DrawString(text, font, Brushes.Black, new PointF(0, 0));
+
+            // 释放资源
+            graphics.Dispose();
+
+            return bitmap;
+        }
+
     }
 }
