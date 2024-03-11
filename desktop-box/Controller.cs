@@ -25,6 +25,12 @@ namespace desktop_box
             this.form = form;
         }
 
+        public void SetBits(Bitmap bitmap, byte alpha = 255)
+        {
+            this.bitmap = this.SetProp(bitmap);
+            this.form.SetBits(this.bitmap,alpha);
+        }
+
         public async void ShowPath(string path, Body body)
         {
             this.delayShow = body.delay ?? this.delayShow;
@@ -33,7 +39,7 @@ namespace desktop_box
             if (File.Exists(path)) // 如果是文件
             {
                 Bitmap image = new Bitmap(path);
-                this.form.SetBits(image);
+                this.SetBits(image);
             }
             else if (Directory.Exists(path)) // 如果是文件夹
             {
@@ -41,14 +47,29 @@ namespace desktop_box
                 foreach (string pngFile in pngFiles)
                 {
                     Bitmap pngImage = new Bitmap(pngFile);
-                    this.form.SetBits(pngImage);
+                    this.SetBits(pngImage);
                     await Task.Delay(this.delayShow);
                 }
                 this.emptBitMap();
             }
             else // 其他情况
             {
-                this.form.ShowText(path, this.delayShow);
+                this.form.ShowFloatingText(path, this.delayShow);
+            }
+        }
+
+        public void setProp(Body body)
+        {
+            this.delayShow = body.delay ?? this.delayShow;
+            this.width = body.width ?? this.width;
+            this.transparency = body.transparency ?? this.transparency;
+        }
+
+        public void updateBitMap()
+        {
+            if (this.bitmap != null)
+            {
+                this.SetBits(this.bitmap);
             }
         }
 
@@ -97,7 +118,7 @@ namespace desktop_box
         }
         public void emptBitMap()
         {
-            this.form.SetBits(new Bitmap(1, 1));
+            this.form.SetBits(new Bitmap(1, 1),0);
         }
 
         public Bitmap SetProp(Bitmap bitmap)

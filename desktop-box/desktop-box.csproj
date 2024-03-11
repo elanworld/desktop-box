@@ -25,7 +25,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <WebPage>publish.htm</WebPage>
     <AutorunEnabled>true</AutorunEnabled>
-    <ApplicationRevision>8</ApplicationRevision>
+    <ApplicationRevision>9</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -83,6 +83,12 @@
   <ItemGroup>
     <Compile Include="Controller.cs" />
     <Compile Include="entity\Body.cs" />
+    <Compile Include="FloatingTextForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FloatingTextForm.Designer.cs">
+      <DependentUpon>FloatingTextForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="HttpApiServer.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

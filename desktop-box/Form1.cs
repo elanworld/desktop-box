@@ -11,6 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Threading.Tasks;
 using Timer = System.Windows.Forms.Timer;
+using System.Security.Policy;
 
 
 namespace desktop_box
@@ -47,7 +48,7 @@ namespace desktop_box
         }
 
         //创建一个分层窗口来支持 setBitmap
-        protected CreateParams CreateParamss
+        protected override CreateParams CreateParams
         {
             get
             {
@@ -60,11 +61,6 @@ namespace desktop_box
         #endregion
 
 
-        public void SetBits(Bitmap bitmap)
-        {
-            Win32.SetBits(this.Handle, bitmap);
-        }
-
         //加载图片文件
         private async void Form1_Load(object sender, EventArgs e)
         {
@@ -75,6 +71,11 @@ namespace desktop_box
             // 设置窗口样式，使其不出现在Alt+Tab切换列表中
             int WS_EX_TOOLWINDOW = 0x80;
             SetWindowLong(this.Handle, -20, GetWindowLong(this.Handle, -20) | WS_EX_TOOLWINDOW);
+        }
+
+        public void SetBits(Bitmap bitmap, byte alpha = 255)
+        {
+            Win32.SetBits(this.Handle, bitmap, 0, 0, alpha);
         }
 
 
@@ -161,6 +162,12 @@ namespace desktop_box
             textTimer.Start(); // 启动计时器
         }
 
+        public void ShowFloatingText(string text, int timeout = 3000)
+        {
+            FloatingTextForm floatingTextForm = new FloatingTextForm(text, timeout);
+            floatingTextForm.Location = this.Location;
+            floatingTextForm.Show();
+        }
 
     }
 }
