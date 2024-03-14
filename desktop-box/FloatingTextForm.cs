@@ -28,6 +28,7 @@ namespace desktop_box
             label.AutoSize = true;
             label.Font = new Font("Arial", 20);
             label.ForeColor = Color.Black;
+            label.BackColor = Color.FromArgb(10, Color.White);
             label.Location = new Point(5, 5); // 设置文字位置
             this.Controls.Add(label);
 

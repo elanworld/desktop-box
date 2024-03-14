@@ -9,12 +9,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Forms;
 using desktop_box.entity;
 using static System.Net.Mime.MediaTypeNames;
+using System.ComponentModel;
 
 namespace desktop_box
 {
     public class Controller
     {
-        public Bitmap bitmap { get; set; }
+        public Bitmap bitmap { get; set; } = new Bitmap(1,1);
         public Form1 form;
         int delayShow = 200;
         double transparency = 1;
@@ -23,12 +24,15 @@ namespace desktop_box
         public Controller(Form1 form)
         {
             this.form = form;
+            ComponentResourceManager resources = new ComponentResourceManager(typeof(Resource1));
+            Bitmap eyes = (Bitmap)resources.GetObject("eyes");
+            this.SetBits(eyes);
         }
 
-        public void SetBits(Bitmap bitmap, byte alpha = 255)
+        public void SetBits(Bitmap bitmap)
         {
             this.bitmap = this.SetProp(bitmap);
-            this.form.SetBits(this.bitmap,alpha);
+            this.form.SetBits(this.bitmap, (byte)(transparency * 255));
         }
 
         public async void ShowPath(string path, Body body)
@@ -113,12 +117,12 @@ namespace desktop_box
         public void Transparency(double op)
         {
             this.transparency = op;
-            this.form.SetBits(this.bitmap);
+            this.SetBits(this.bitmap);
 
         }
         public void emptBitMap()
         {
-            this.form.SetBits(new Bitmap(1, 1),0);
+            this.form.SetBits(new Bitmap(1, 1), 0);
         }
 
         public Bitmap SetProp(Bitmap bitmap)
@@ -131,25 +135,6 @@ namespace desktop_box
             {
                 bitmap = new Bitmap(1, 1);
             }
-            else if (this.transparency == 1)
-            {
-
-            }
-            else
-            {
-                for (int i = 0; i < (bitmap.Width); i++)
-                {
-                    for (int j = 0; j < (bitmap.Height); j++)
-                    {
-                        Color color = bitmap.GetPixel(i, j);
-                        if (!(color.G == 0 && color.B == 0 && color.R == 0))
-                        {
-                            bitmap.SetPixel(i, j, Color.FromArgb((int)(this.transparency * 255), color));
-                        }
-                    }
-                }
-            }
-            this.bitmap = bitmap;
             return bitmap;
         }
 

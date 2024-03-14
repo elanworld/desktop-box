@@ -118,26 +118,6 @@ namespace desktop_box
                             }
                             return JsonConvert.SerializeObject(reqBody);
                         }
-                        // 废弃api
-                        else if (req.RawUrl.Equals("/move"))
-                        {
-                            if (reqBody.X != null && reqBody.Y != null)
-                            {
-                                contrller.form.MoveWindows((int)reqBody.X, (int)reqBody.Y);
-                            }
-                        }
-                        else if (req.RawUrl.Equals("/swap"))
-                        {
-                            contrller.form.MoveWindows((int)reqBody.X, (int)reqBody.Y, (int)reqBody.X1, (int)reqBody.Y1, reqBody.duration);
-                        }
-                        else if (req.RawUrl.Equals("/state"))
-                        {
-                            contrller.Transparency(reqBody.transparency??1);
-                        }
-                        else if (req.RawUrl.Equals("/ShowPath"))
-                        {
-                            contrller.ShowPath(reqBody.showPath, reqBody);
-                        }
                     }
                     return JsonConvert.SerializeObject(new Body());
                 }

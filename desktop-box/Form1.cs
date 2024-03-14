@@ -64,10 +64,6 @@ namespace desktop_box
         //加载图片文件
         private async void Form1_Load(object sender, EventArgs e)
         {
-            this.TopMost = true;
-            ComponentResourceManager resources = new ComponentResourceManager(typeof(Resource1));
-            Bitmap eyes = (Bitmap)resources.GetObject("eyes");
-            SetBits(eyes);
             // 设置窗口样式，使其不出现在Alt+Tab切换列表中
             int WS_EX_TOOLWINDOW = 0x80;
             SetWindowLong(this.Handle, -20, GetWindowLong(this.Handle, -20) | WS_EX_TOOLWINDOW);
@@ -75,7 +71,7 @@ namespace desktop_box
 
         public void SetBits(Bitmap bitmap, byte alpha = 255)
         {
-            Win32.SetBits(this.Handle, bitmap, 0, 0, alpha);
+            Win32.SetBits(this.Handle, bitmap, this.Location.X, this.Location.Y, alpha);
         }
 
 
@@ -108,14 +104,37 @@ namespace desktop_box
             }
         }
 
-        public void MoveWindows(int beforeWidth, int beforeHeight, int afterWidth, int afterHeigth, double duration)
+public void MoveWindows(int beforeX, int beforeY, int afterX, int afterY, double duration)
+    {
+        DateTime startTime = DateTime.Now;
+        TimeSpan elapsed;
+        TimeSpan targetInterval = TimeSpan.FromMilliseconds(10);
+        
+        for (int i = 0; i < duration * 1000 / targetInterval.TotalMilliseconds; i++)
         {
-            for (int i = 0; i < duration * 1000 / 10; i++)
-            {
-                Location = new Point((int)(beforeWidth + (i + 1) * ((afterWidth - beforeWidth) / (duration * 1000 / 10))), (int)(beforeHeight + (i + 1) * ((afterHeigth - beforeHeight) / (duration * 1000 / 10))));
-                Thread.Sleep(10);
-            }
+            // Calculate progress ratio
+            double progress = (i + 1) / (duration * 1000 / targetInterval.TotalMilliseconds);
+
+            // Calculate new position
+            int newX = (int)(beforeX + progress * (afterX - beforeX));
+            int newY = (int)(beforeY + progress * (afterY - beforeY));
+
+            // Move window
+            Location = new Point(newX, newY);
+
+            // Calculate elapsed time since startTime
+            elapsed = DateTime.Now - startTime;
+
+            // Calculate remaining time to sleep
+            TimeSpan remainingTime = TimeSpan.FromMilliseconds(targetInterval.TotalMilliseconds * (i+1)) - elapsed;
+
+            // If remaining time is positive, sleep for remaining time
+            if (remainingTime > TimeSpan.Zero)
+                Thread.Sleep(remainingTime);
         }
+        Console.WriteLine($"swap time:{DateTime.Now - startTime}" );
+    }
+
 
         public void MoveWindows(int width, int height)
         {
